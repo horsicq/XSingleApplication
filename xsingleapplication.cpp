@@ -20,7 +20,12 @@
 //
 #include "xsingleapplication.h"
 
-XSingleApplication::XSingleApplication(QObject *pParent) : QObject(pParent)
+XSingleApplication::XSingleApplication(int &argc, char *argv[]) : QCoreApplication(argc,argv)
+{
+
+}
+
+XSingleApplication::~XSingleApplication()
 {
 
 }

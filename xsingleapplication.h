@@ -22,12 +22,14 @@
 #define XSINGLEAPPLICATION_H
 
 #include <QObject>
+#include <QCoreApplication>
 
-class XSingleApplication : public QObject
+class XSingleApplication : public QCoreApplication
 {
     Q_OBJECT
 public:
-    explicit XSingleApplication(QObject *pParent=nullptr);
+    explicit XSingleApplication(int &argc, char *argv[]);
+    ~XSingleApplication() override;
 
 signals:
 
