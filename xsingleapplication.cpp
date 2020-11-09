@@ -20,12 +20,37 @@
 //
 #include "xsingleapplication.h"
 
-XSingleApplication::XSingleApplication(int &argc, char *argv[]) : QCoreApplication(argc,argv)
+XSingleApplication::XSingleApplication(int &argc, char *argv[]) : QApplication(argc,argv)
 {
+    QString sUser=getUser();
 
+    QString sID=sGetApplicationID();
 }
 
 XSingleApplication::~XSingleApplication()
 {
 
+}
+
+QString XSingleApplication::getUser()
+{
+    QString sResult;
+
+#ifdef Q_OS_WINDOWS
+    sResult=qgetenv("USERNAME");
+#else
+    sResult=qgetenv("USER");
+#endif
+
+    return sResult;
+}
+
+QString XSingleApplication::sGetApplicationID()
+{
+    QString sString=QString("%1|%2|%3").arg(QCoreApplication::organizationName()).arg(QCoreApplication::applicationName()).arg(getUser());
+
+    QCryptographicHash cryptoHash(QCryptographicHash::Md5);
+    cryptoHash.addData(sString.toUtf8());
+
+    return cryptoHash.result().toHex();
 }

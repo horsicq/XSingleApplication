@@ -22,14 +22,19 @@
 #define XSINGLEAPPLICATION_H
 
 #include <QObject>
-#include <QCoreApplication>
+#include <QApplication>
+#include <QCryptographicHash>
 
-class XSingleApplication : public QCoreApplication
+class XSingleApplication : public QApplication
 {
     Q_OBJECT
 public:
     explicit XSingleApplication(int &argc, char *argv[]);
     ~XSingleApplication() override;
+
+private:
+    QString getUser();
+    QString sGetApplicationID();
 
 signals:
 
