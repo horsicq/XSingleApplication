@@ -24,20 +24,24 @@
 #include <QObject>
 #include <QApplication>
 #include <QCryptographicHash>
+#include <QSharedMemory>
 
 class XSingleApplication : public QApplication
 {
     Q_OBJECT
 public:
-    explicit XSingleApplication(int &argc, char *argv[]);
+    explicit XSingleApplication(int &argc,char *argv[],bool bIsSingle);
     ~XSingleApplication() override;
 
 private:
     QString getUser();
     QString sGetApplicationID();
+    void cleanUp();
 
 signals:
 
+private:
+    QSharedMemory *g_pSharedMemory;
 };
 
 #endif // XSINGLEAPPLICATION_H

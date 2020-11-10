@@ -20,16 +20,43 @@
 //
 #include "xsingleapplication.h"
 
-XSingleApplication::XSingleApplication(int &argc, char *argv[]) : QApplication(argc,argv)
+XSingleApplication::XSingleApplication(int &argc, char *argv[], bool bIsSingle) : QApplication(argc,argv)
 {
-    QString sUser=getUser();
+    g_pSharedMemory=nullptr;
 
-    QString sID=sGetApplicationID();
+    QString sApplicationID=sGetApplicationID();
+
+#ifndef Q_OS_WINDOWS
+    // Cleanup for unix after crash
+    // https://doc.qt.io/qt-5/qsharedmemory.html
+    g_pSharedMemory=new QSharedMemory(sApplicationID);
+    g_pSharedMemory->attach();
+    cleanUp();
+#endif
+
+    if(bIsSingle)
+    {
+        g_pSharedMemory=new QSharedMemory(sApplicationID);
+
+        if(g_pSharedMemory->attach())
+        {
+            // TODO
+            qDebug("Instance!!!");
+
+            cleanUp();
+
+            exit();
+        }
+        else
+        {
+            g_pSharedMemory->create(0x1000);
+        }
+    }
 }
 
 XSingleApplication::~XSingleApplication()
 {
-
+    cleanUp();
 }
 
 QString XSingleApplication::getUser()
@@ -53,4 +80,13 @@ QString XSingleApplication::sGetApplicationID()
     cryptoHash.addData(sString.toUtf8());
 
     return cryptoHash.result().toHex();
+}
+
+void XSingleApplication::cleanUp()
+{
+    if(g_pSharedMemory)
+    {
+        delete g_pSharedMemory;
+        g_pSharedMemory=nullptr;
+    }
 }
