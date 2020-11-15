@@ -44,8 +44,6 @@ XSingleApplication::XSingleApplication(int &argc, char *argv[], bool bIsSingle) 
             qDebug("Instance!!!");
 
             cleanUp();
-
-            exit();
         }
         else
         {
