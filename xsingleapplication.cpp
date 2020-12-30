@@ -42,6 +42,8 @@ XSingleApplication::XSingleApplication(int &argc, char *argv[], bool bIsSingle) 
         {
             // TODO
             qDebug("Instance!!!");
+            // TODO SendMessage
+            // TODO QtLocalSocket
 
             cleanUp();
         }
