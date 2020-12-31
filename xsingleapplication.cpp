@@ -23,6 +23,7 @@
 XSingleApplication::XSingleApplication(int &argc, char *argv[], bool bIsSingle) : QApplication(argc,argv)
 {
     g_pSharedMemory=nullptr;
+    g_bIsPrimary=false;
 
     QString sApplicationID=sGetApplicationID();
 
@@ -50,13 +51,23 @@ XSingleApplication::XSingleApplication(int &argc, char *argv[], bool bIsSingle) 
         else
         {
             g_pSharedMemory->create(0x1000);
+            g_bIsPrimary=true;
         }
+    }
+    else
+    {
+        g_bIsPrimary=true;
     }
 }
 
 XSingleApplication::~XSingleApplication()
 {
     cleanUp();
+}
+
+bool XSingleApplication::isPrimary()
+{
+    return g_bIsPrimary;
 }
 
 QString XSingleApplication::getUser()

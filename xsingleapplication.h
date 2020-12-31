@@ -33,6 +33,8 @@ public:
     explicit XSingleApplication(int &argc,char *argv[],bool bIsSingle);
     ~XSingleApplication() override;
 
+    bool isPrimary();
+
 private:
     QString getUser();
     QString sGetApplicationID();
@@ -42,6 +44,7 @@ signals:
 
 private:
     QSharedMemory *g_pSharedMemory;
+    bool g_bIsPrimary;
 };
 
 #endif // XSINGLEAPPLICATION_H
