@@ -24,6 +24,7 @@ XSingleApplication::XSingleApplication(int &argc, char *argv[], bool bIsSingle) 
 {
     g_pSharedMemory=nullptr;
     g_bIsPrimary=false;
+    g_pLocalServer=0;
 
     QString sApplicationID=sGetApplicationID();
 
@@ -41,7 +42,6 @@ XSingleApplication::XSingleApplication(int &argc, char *argv[], bool bIsSingle) 
 
         if(g_pSharedMemory->attach())
         {
-            // TODO
             qDebug("Instance!!!");
             // TODO SendMessage
             // TODO QtLocalSocket
@@ -52,6 +52,9 @@ XSingleApplication::XSingleApplication(int &argc, char *argv[], bool bIsSingle) 
         {
             g_pSharedMemory->create(0x1000);
             g_bIsPrimary=true;
+
+            QLocalServer::removeServer(sApplicationID);
+            g_pLocalServer=new QLocalServer();
         }
     }
     else
@@ -99,5 +102,11 @@ void XSingleApplication::cleanUp()
     {
         delete g_pSharedMemory;
         g_pSharedMemory=nullptr;
+    }
+
+    if(g_pLocalServer)
+    {
+        g_pLocalServer->close();
+        delete g_pLocalServer;
     }
 }

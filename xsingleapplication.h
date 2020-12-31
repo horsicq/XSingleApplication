@@ -25,6 +25,7 @@
 #include <QApplication>
 #include <QCryptographicHash>
 #include <QSharedMemory>
+#include <QLocalServer>
 
 class XSingleApplication : public QApplication
 {
@@ -45,6 +46,7 @@ signals:
 private:
     QSharedMemory *g_pSharedMemory;
     bool g_bIsPrimary;
+    QLocalServer *g_pLocalServer;
 };
 
 #endif // XSINGLEAPPLICATION_H
