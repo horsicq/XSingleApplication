@@ -25,6 +25,7 @@
 #include <QApplication>
 #include <QCryptographicHash>
 #include <QSharedMemory>
+#include <QLocalSocket>
 #include <QLocalServer>
 
 class XSingleApplication : public QApplication
@@ -41,11 +42,13 @@ private:
     QString sGetApplicationID();
     void cleanUp();
 
-signals:
+private slots:
+    void serverConnection();
 
 private:
     QSharedMemory *g_pSharedMemory;
     bool g_bIsPrimary;
+    QLocalSocket *g_pLocalSocket;
     QLocalServer *g_pLocalServer;
 };
 

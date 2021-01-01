@@ -25,6 +25,7 @@ XSingleApplication::XSingleApplication(int &argc, char *argv[], bool bIsSingle) 
     g_pSharedMemory=nullptr;
     g_bIsPrimary=false;
     g_pLocalServer=0;
+    g_pLocalSocket=0;
 
     QString sApplicationID=sGetApplicationID();
 
@@ -43,8 +44,15 @@ XSingleApplication::XSingleApplication(int &argc, char *argv[], bool bIsSingle) 
         if(g_pSharedMemory->attach())
         {
             qDebug("Instance!!!");
-            // TODO SendMessage
-            // TODO QtLocalSocket
+            // TODO Serialize
+            g_pLocalSocket=new QLocalSocket();
+            g_pLocalSocket->connectToServer(sApplicationID);
+            g_pLocalSocket->waitForConnected();
+            g_pLocalSocket->write("TestConnection"); // TODO
+            g_pLocalSocket->waitForBytesWritten();
+            g_pLocalSocket->flush();
+
+            qDebug("END");
 
             cleanUp();
         }
@@ -55,6 +63,9 @@ XSingleApplication::XSingleApplication(int &argc, char *argv[], bool bIsSingle) 
 
             QLocalServer::removeServer(sApplicationID);
             g_pLocalServer=new QLocalServer();
+            g_pLocalServer->setSocketOptions(QLocalServer::UserAccessOption);
+            g_pLocalServer->listen(sApplicationID);
+            connect(g_pLocalServer,SIGNAL(newConnection()),this,SLOT(serverConnection()));
         }
     }
     else
@@ -109,4 +120,15 @@ void XSingleApplication::cleanUp()
         g_pLocalServer->close();
         delete g_pLocalServer;
     }
+
+    if(g_pLocalSocket)
+    {
+        g_pLocalSocket->close();
+        delete g_pLocalSocket;
+    }
+}
+
+void XSingleApplication::serverConnection()
+{
+    qDebug("void XSingleApplication::serverConnection()");
 }
