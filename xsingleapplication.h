@@ -32,9 +32,10 @@ class XSingleApplication : public QApplication
 {
     Q_OBJECT
 public:
-    explicit XSingleApplication(int &argc,char *argv[],bool bIsSingle);
+    explicit XSingleApplication(int &argc, char *argv[]);
     ~XSingleApplication() override;
 
+    void enableSingleInstance();
     bool isPrimary();
 
 private:
@@ -48,8 +49,8 @@ private slots:
 private:
     QSharedMemory *g_pSharedMemory;
     bool g_bIsPrimary;
-    QLocalSocket *g_pLocalSocket;
     QLocalServer *g_pLocalServer;
+    QString g_sArgument;
 };
 
 #endif // XSINGLEAPPLICATION_H

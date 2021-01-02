@@ -20,13 +20,25 @@
 //
 #include "xsingleapplication.h"
 
-XSingleApplication::XSingleApplication(int &argc, char *argv[], bool bIsSingle) : QApplication(argc,argv)
+XSingleApplication::XSingleApplication(int &argc, char *argv[]) : QApplication(argc,argv)
 {
     g_pSharedMemory=nullptr;
-    g_bIsPrimary=false;
     g_pLocalServer=0;
-    g_pLocalSocket=0;
+    g_bIsPrimary=true;
 
+    if(argc>1)
+    {
+        g_sArgument=argv[1];
+    }
+}
+
+XSingleApplication::~XSingleApplication()
+{
+    cleanUp();
+}
+
+void XSingleApplication::enableSingleInstance()
+{
     QString sApplicationID=sGetApplicationID();
 
 #ifndef Q_OS_WINDOWS
@@ -37,46 +49,33 @@ XSingleApplication::XSingleApplication(int &argc, char *argv[], bool bIsSingle) 
     cleanUp();
 #endif
 
-    if(bIsSingle)
+    g_pSharedMemory=new QSharedMemory(sApplicationID);
+
+    if(g_pSharedMemory->attach())
     {
-        g_pSharedMemory=new QSharedMemory(sApplicationID);
-
-        if(g_pSharedMemory->attach())
+        if(g_sArgument!="")
         {
-            qDebug("Instance!!!");
-            // TODO Serialize
-            g_pLocalSocket=new QLocalSocket();
-            g_pLocalSocket->connectToServer(sApplicationID);
-            g_pLocalSocket->waitForConnected();
-            g_pLocalSocket->write("TestConnection"); // TODO
-            g_pLocalSocket->waitForBytesWritten();
-            g_pLocalSocket->flush();
-
-            qDebug("END");
-
-            cleanUp();
+            QLocalSocket localSocket;
+            localSocket.connectToServer(sApplicationID);
+            localSocket.waitForConnected();
+            localSocket.write(g_sArgument.toUtf8());
+            localSocket.waitForBytesWritten();
+            localSocket.flush();
         }
-        else
-        {
-            g_pSharedMemory->create(0x1000);
-            g_bIsPrimary=true;
 
-            QLocalServer::removeServer(sApplicationID);
-            g_pLocalServer=new QLocalServer();
-            g_pLocalServer->setSocketOptions(QLocalServer::UserAccessOption);
-            g_pLocalServer->listen(sApplicationID);
-            connect(g_pLocalServer,SIGNAL(newConnection()),this,SLOT(serverConnection()));
-        }
+        cleanUp();
     }
     else
     {
+        g_pSharedMemory->create(0x1000);
         g_bIsPrimary=true;
-    }
-}
 
-XSingleApplication::~XSingleApplication()
-{
-    cleanUp();
+        QLocalServer::removeServer(sApplicationID);
+        g_pLocalServer=new QLocalServer();
+        g_pLocalServer->setSocketOptions(QLocalServer::UserAccessOption);
+        g_pLocalServer->listen(sApplicationID);
+        connect(g_pLocalServer,SIGNAL(newConnection()),this,SLOT(serverConnection()));
+    }
 }
 
 bool XSingleApplication::isPrimary()
@@ -119,12 +118,6 @@ void XSingleApplication::cleanUp()
     {
         g_pLocalServer->close();
         delete g_pLocalServer;
-    }
-
-    if(g_pLocalSocket)
-    {
-        g_pLocalSocket->close();
-        delete g_pLocalSocket;
     }
 }
 
