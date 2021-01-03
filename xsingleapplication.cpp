@@ -53,6 +53,8 @@ void XSingleApplication::enableSingleInstance()
 
     if(g_pSharedMemory->attach())
     {
+        g_bIsPrimary=false;
+
         if(g_sArgument!="")
         {
             QLocalSocket localSocket;
@@ -67,8 +69,9 @@ void XSingleApplication::enableSingleInstance()
     }
     else
     {
-        g_pSharedMemory->create(0x1000);
         g_bIsPrimary=true;
+
+        g_pSharedMemory->create(0x1000);
 
         QLocalServer::removeServer(sApplicationID);
         g_pLocalServer=new QLocalServer();
@@ -123,5 +126,14 @@ void XSingleApplication::cleanUp()
 
 void XSingleApplication::serverConnection()
 {
-    qDebug("void XSingleApplication::serverConnection()");
+    g_pSocket=g_pLocalServer->nextPendingConnection();
+
+    connect(g_pSocket,SIGNAL(readyRead()),this,SLOT(readMessage()));
+}
+
+void XSingleApplication::readMessage()
+{
+    QString sMessage=QString::fromUtf8(g_pSocket->readAll());
+
+    emit messageText(sMessage);
 }

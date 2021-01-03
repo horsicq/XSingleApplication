@@ -45,11 +45,16 @@ private:
 
 private slots:
     void serverConnection();
+    void readMessage();
+
+signals:
+    void messageText(QString sMessage);
 
 private:
     QSharedMemory *g_pSharedMemory;
     bool g_bIsPrimary;
     QLocalServer *g_pLocalServer;
+    QLocalSocket *g_pSocket;
     QString g_sArgument;
 };
 
