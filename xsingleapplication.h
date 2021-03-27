@@ -33,7 +33,7 @@ class XSingleApplication : public QApplication
     Q_OBJECT
 
 public:
-    explicit XSingleApplication(int &argc, char *argv[]);
+    explicit XSingleApplication(int &argc,char *argv[]);
     ~XSingleApplication() override;
 
     void enableSingleInstance();
