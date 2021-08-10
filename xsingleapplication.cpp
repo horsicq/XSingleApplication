@@ -101,7 +101,7 @@ QString XSingleApplication::getUser()
 
 QString XSingleApplication::sGetApplicationID()
 {
-    QString sString=QString("%1|%2|%3").arg(QCoreApplication::organizationName()).arg(QCoreApplication::applicationName()).arg(getUser());
+    QString sString=QString("%1|%2|%3").arg(QCoreApplication::organizationName(),QCoreApplication::applicationName(),getUser());
 
     QCryptographicHash cryptoHash(QCryptographicHash::Md5);
     cryptoHash.addData(sString.toUtf8());
