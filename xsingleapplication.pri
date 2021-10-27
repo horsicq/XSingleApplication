@@ -8,3 +8,6 @@ HEADERS += \
 
 SOURCES += \
     $$PWD/xsingleapplication.cpp
+
+DISTFILES += \
+    $$PWD/xsingleapplication.cmake
