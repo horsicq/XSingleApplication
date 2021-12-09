@@ -21,12 +21,12 @@
 #ifndef XSINGLEAPPLICATION_H
 #define XSINGLEAPPLICATION_H
 
-#include <QObject>
 #include <QApplication>
 #include <QCryptographicHash>
-#include <QSharedMemory>
-#include <QLocalSocket>
 #include <QLocalServer>
+#include <QLocalSocket>
+#include <QObject>
+#include <QSharedMemory>
 
 class XSingleApplication : public QApplication
 {
