@@ -23,7 +23,7 @@
 XSingleApplication::XSingleApplication(int &argc,char *argv[]) : QApplication(argc,argv)
 {
     g_pSharedMemory=nullptr;
-    g_pLocalServer=0;
+    g_pLocalServer=nullptr;
     g_bIsPrimary=true;
 
     if(argc>1)
