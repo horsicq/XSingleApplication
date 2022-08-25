@@ -41,7 +41,7 @@ void XSingleApplication::enableSingleInstance()
 {
     QString sApplicationID=sGetApplicationID();
 
-#ifndef Q_OS_WINDOWS
+#ifndef Q_OS_WIN
     // Cleanup for unix after crash
     // https://doc.qt.io/qt-5/qsharedmemory.html
     g_pSharedMemory=new QSharedMemory(sApplicationID);
