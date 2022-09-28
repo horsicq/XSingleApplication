@@ -10,4 +10,6 @@ SOURCES += \
     $$PWD/xsingleapplication.cpp
 
 DISTFILES += \
+    $$PWD/LICENSE \
+    $$PWD/README.md \
     $$PWD/xsingleapplication.cmake
