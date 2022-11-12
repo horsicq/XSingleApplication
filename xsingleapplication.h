@@ -28,12 +28,11 @@
 #include <QObject>
 #include <QSharedMemory>
 
-class XSingleApplication : public QApplication
-{
+class XSingleApplication : public QApplication {
     Q_OBJECT
 
 public:
-    explicit XSingleApplication(int &argc,char *argv[]);
+    explicit XSingleApplication(int &argc, char *argv[]);
     ~XSingleApplication() override;
 
     void enableSingleInstance();
@@ -59,4 +58,4 @@ private:
     QString g_sArgument;
 };
 
-#endif // XSINGLEAPPLICATION_H
+#endif  // XSINGLEAPPLICATION_H

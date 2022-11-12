@@ -20,43 +20,37 @@
  */
 #include "xsingleapplication.h"
 
-XSingleApplication::XSingleApplication(int &argc,char *argv[]) : QApplication(argc,argv)
-{
-    g_pSharedMemory=nullptr;
-    g_pLocalServer=nullptr;
-    g_bIsPrimary=true;
+XSingleApplication::XSingleApplication(int &argc, char *argv[]) : QApplication(argc, argv) {
+    g_pSharedMemory = nullptr;
+    g_pLocalServer = nullptr;
+    g_bIsPrimary = true;
 
-    if(argc>1)
-    {
-        g_sArgument=argv[1];
+    if (argc > 1) {
+        g_sArgument = argv[1];
     }
 }
 
-XSingleApplication::~XSingleApplication()
-{
+XSingleApplication::~XSingleApplication() {
     cleanUp();
 }
 
-void XSingleApplication::enableSingleInstance()
-{
-    QString sApplicationID=sGetApplicationID();
+void XSingleApplication::enableSingleInstance() {
+    QString sApplicationID = sGetApplicationID();
 
 #ifndef Q_OS_WIN
     // Cleanup for unix after crash
     // https://doc.qt.io/qt-5/qsharedmemory.html
-    g_pSharedMemory=new QSharedMemory(sApplicationID);
+    g_pSharedMemory = new QSharedMemory(sApplicationID);
     g_pSharedMemory->attach();
     cleanUp();
 #endif
 
-    g_pSharedMemory=new QSharedMemory(sApplicationID);
+    g_pSharedMemory = new QSharedMemory(sApplicationID);
 
-    if(g_pSharedMemory->attach())
-    {
-        g_bIsPrimary=false;
+    if (g_pSharedMemory->attach()) {
+        g_bIsPrimary = false;
 
-        if(g_sArgument!="")
-        {
+        if (g_sArgument != "") {
             QLocalSocket localSocket;
             localSocket.connectToServer(sApplicationID);
             localSocket.waitForConnected();
@@ -66,42 +60,37 @@ void XSingleApplication::enableSingleInstance()
         }
 
         cleanUp();
-    }
-    else
-    {
-        g_bIsPrimary=true;
+    } else {
+        g_bIsPrimary = true;
 
         g_pSharedMemory->create(0x1000);
 
         QLocalServer::removeServer(sApplicationID);
-        g_pLocalServer=new QLocalServer();
+        g_pLocalServer = new QLocalServer();
         g_pLocalServer->setSocketOptions(QLocalServer::UserAccessOption);
         g_pLocalServer->listen(sApplicationID);
-        connect(g_pLocalServer,SIGNAL(newConnection()),this,SLOT(serverConnection()));
+        connect(g_pLocalServer, SIGNAL(newConnection()), this, SLOT(serverConnection()));
     }
 }
 
-bool XSingleApplication::isPrimary()
-{
+bool XSingleApplication::isPrimary() {
     return g_bIsPrimary;
 }
 
-QString XSingleApplication::getUser()
-{
+QString XSingleApplication::getUser() {
     QString sResult;
 
 #ifdef Q_OS_WINDOWS
-    sResult=qgetenv("USERNAME");
+    sResult = qgetenv("USERNAME");
 #else
-    sResult=qgetenv("USER");
+    sResult = qgetenv("USER");
 #endif
 
     return sResult;
 }
 
-QString XSingleApplication::sGetApplicationID()
-{
-    QString sString=QString("%1|%2|%3").arg(QCoreApplication::organizationName(),QCoreApplication::applicationName(),getUser());
+QString XSingleApplication::sGetApplicationID() {
+    QString sString = QString("%1|%2|%3").arg(QCoreApplication::organizationName(), QCoreApplication::applicationName(), getUser());
 
     QCryptographicHash cryptoHash(QCryptographicHash::Md5);
     cryptoHash.addData(sString.toUtf8());
@@ -109,31 +98,26 @@ QString XSingleApplication::sGetApplicationID()
     return cryptoHash.result().toHex();
 }
 
-void XSingleApplication::cleanUp()
-{
-    if(g_pSharedMemory)
-    {
+void XSingleApplication::cleanUp() {
+    if (g_pSharedMemory) {
         delete g_pSharedMemory;
-        g_pSharedMemory=nullptr;
+        g_pSharedMemory = nullptr;
     }
 
-    if(g_pLocalServer)
-    {
+    if (g_pLocalServer) {
         g_pLocalServer->close();
         delete g_pLocalServer;
     }
 }
 
-void XSingleApplication::serverConnection()
-{
-    g_pSocket=g_pLocalServer->nextPendingConnection();
+void XSingleApplication::serverConnection() {
+    g_pSocket = g_pLocalServer->nextPendingConnection();
 
-    connect(g_pSocket,SIGNAL(readyRead()),this,SLOT(readMessage()));
+    connect(g_pSocket, SIGNAL(readyRead()), this, SLOT(readMessage()));
 }
 
-void XSingleApplication::readMessage()
-{
-    QString sMessage=QString::fromUtf8(g_pSocket->readAll());
+void XSingleApplication::readMessage() {
+    QString sMessage = QString::fromUtf8(g_pSocket->readAll());
 
     emit messageText(sMessage);
 }
