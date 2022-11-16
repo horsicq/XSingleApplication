@@ -20,7 +20,8 @@
  */
 #include "xsingleapplication.h"
 
-XSingleApplication::XSingleApplication(int &argc, char *argv[]) : QApplication(argc, argv) {
+XSingleApplication::XSingleApplication(int &argc, char *argv[]) : QApplication(argc, argv)
+{
     g_pSharedMemory = nullptr;
     g_pLocalServer = nullptr;
     g_bIsPrimary = true;
@@ -30,11 +31,13 @@ XSingleApplication::XSingleApplication(int &argc, char *argv[]) : QApplication(a
     }
 }
 
-XSingleApplication::~XSingleApplication() {
+XSingleApplication::~XSingleApplication()
+{
     cleanUp();
 }
 
-void XSingleApplication::enableSingleInstance() {
+void XSingleApplication::enableSingleInstance()
+{
     QString sApplicationID = sGetApplicationID();
 
 #ifndef Q_OS_WIN
@@ -73,11 +76,13 @@ void XSingleApplication::enableSingleInstance() {
     }
 }
 
-bool XSingleApplication::isPrimary() {
+bool XSingleApplication::isPrimary()
+{
     return g_bIsPrimary;
 }
 
-QString XSingleApplication::getUser() {
+QString XSingleApplication::getUser()
+{
     QString sResult;
 
 #ifdef Q_OS_WINDOWS
@@ -89,7 +94,8 @@ QString XSingleApplication::getUser() {
     return sResult;
 }
 
-QString XSingleApplication::sGetApplicationID() {
+QString XSingleApplication::sGetApplicationID()
+{
     QString sString = QString("%1|%2|%3").arg(QCoreApplication::organizationName(), QCoreApplication::applicationName(), getUser());
 
     QCryptographicHash cryptoHash(QCryptographicHash::Md5);
@@ -98,7 +104,8 @@ QString XSingleApplication::sGetApplicationID() {
     return cryptoHash.result().toHex();
 }
 
-void XSingleApplication::cleanUp() {
+void XSingleApplication::cleanUp()
+{
     if (g_pSharedMemory) {
         delete g_pSharedMemory;
         g_pSharedMemory = nullptr;
@@ -110,13 +117,15 @@ void XSingleApplication::cleanUp() {
     }
 }
 
-void XSingleApplication::serverConnection() {
+void XSingleApplication::serverConnection()
+{
     g_pSocket = g_pLocalServer->nextPendingConnection();
 
     connect(g_pSocket, SIGNAL(readyRead()), this, SLOT(readMessage()));
 }
 
-void XSingleApplication::readMessage() {
+void XSingleApplication::readMessage()
+{
     QString sMessage = QString::fromUtf8(g_pSocket->readAll());
 
     emit messageText(sMessage);
