@@ -20,7 +20,8 @@
  */
 #include "xsingleapplication.h"
 
-XSingleApplication::XSingleApplication(int &argc, char *argv[]) : QApplication(argc, argv)
+XSingleApplication::XSingleApplication(int &argc, char *argv[])
+    : QApplication(argc, argv)
 {
     g_pSharedMemory = nullptr;
     g_pLocalServer = nullptr;
