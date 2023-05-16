@@ -38,7 +38,7 @@ XSingleApplication::~XSingleApplication()
 
 void XSingleApplication::enableSingleInstance()
 {
-    QString sApplicationID = sGetApplicationID();
+    QString sApplicationID = getApplicationID();
 
 #ifndef Q_OS_WIN
     // Cleanup for unix after crash
@@ -94,7 +94,7 @@ QString XSingleApplication::getUser()
     return sResult;
 }
 
-QString XSingleApplication::sGetApplicationID()
+QString XSingleApplication::getApplicationID()
 {
     QString sString = QString("%1|%2|%3").arg(QCoreApplication::organizationName(), QCoreApplication::applicationName(), getUser());
 

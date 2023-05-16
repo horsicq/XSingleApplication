@@ -40,7 +40,7 @@ public:
 
 private:
     QString getUser();
-    QString sGetApplicationID();
+    QString getApplicationID();
     void cleanUp();
 
 private slots:
