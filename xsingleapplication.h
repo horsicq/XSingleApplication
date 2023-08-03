@@ -48,7 +48,7 @@ private slots:
     void readMessage();
 
 signals:
-    void messageText(QString sMessage);
+    void messageText(const QString &sMessage);
 
 private:
     QSharedMemory *g_pSharedMemory;
