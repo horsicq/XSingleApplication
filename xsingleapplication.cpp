@@ -20,6 +20,8 @@
  */
 #include "xsingleapplication.h"
 
+#include <QDebug>
+
 XSingleApplication::XSingleApplication(int &argc, char *argv[]) : QApplication(argc, argv)
 {
     g_pSharedMemory = nullptr;
@@ -56,10 +58,19 @@ void XSingleApplication::enableSingleInstance()
         if (g_sArgument != "") {
             QLocalSocket localSocket;
             localSocket.connectToServer(sApplicationID);
-            localSocket.waitForConnected();
-            localSocket.write(g_sArgument.toUtf8());
-            localSocket.waitForBytesWritten();
-            localSocket.flush();
+
+            if (localSocket.waitForConnected()) {
+                QByteArray baArgument = g_sArgument.toUtf8();
+                qint64 nBytesWritten = localSocket.write(baArgument);
+
+                if ((nBytesWritten != baArgument.size()) || !localSocket.waitForBytesWritten()) {
+                    qWarning() << "Cannot send argument to primary instance:" << localSocket.errorString();
+                }
+
+                localSocket.flush();
+            } else {
+                qWarning() << "Cannot connect to primary instance:" << localSocket.errorString();
+            }
         }
 
         cleanUp();
@@ -96,7 +107,7 @@ QString XSingleApplication::getUser()
 
 QString XSingleApplication::getApplicationID()
 {
-    QString sString = QString("%1|%2|%3").arg(QCoreApplication::organizationName(), QCoreApplication::applicationName(), getUser());
+    QString sString = QString("%1|%2|%3").arg(QCoreApplication::organizationName()).arg(QCoreApplication::applicationName()).arg(getUser());
 
     QCryptographicHash cryptoHash(QCryptographicHash::Md5);
     cryptoHash.addData(sString.toUtf8());
